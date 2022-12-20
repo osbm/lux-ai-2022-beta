@@ -1,0 +1,33 @@
+name: Kaggle submission
+
+
+on:
+  push:
+  workflow_dispatch:
+
+
+
+env:
+  COMPETITION_NAME: lux-ai-2022-beta
+
+
+jobs:
+  kaggle-submission:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Login to Kaggle
+        uses: osbm/kaggle-login@main
+        with:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+
+        - name: compress submission
+          run: |
+          tar -czvf submission.tar.gz *
+
+      - name: Submit to Kaggle
+        run: |
+          kaggle competitions submit -c ${{ env.COMPETITION_NAME }} -f submission.tar.gz -m "Auto submit from GitHub Actions current branch: $GITHUB_REF commit hash: $GITHUB_SHA"
